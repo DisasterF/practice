@@ -8,33 +8,43 @@ using namespace std;
 int main() {
   string temp;
   double sum = 0;
-  double min = 1000000;
-  double max = 0;
   int cnt = 0;
+  bool have_unit, have_number, validity;
   vector<double> arr;
   while (cin >> temp) {
-    bool have_unit, have_number = false;
+    if (temp == "terminate") {
+      break;
+    }
+    have_unit = false;
+    have_number = false;
+    validity = true;
     double v = 0;
     string unit;
     for (char i : temp) {
-      if (int(i) <= int('9')) { // check if input contains number
+      if ((int(i) <= int('9')) && (int(i) >= int('0')) ||
+          (int(i) == int('.'))) { // check if input contains number
         have_number = true;
+        if (have_unit == true) {
+          if (validity) {
+            cout << "Error: Number after unit.\n";
+          }
+          validity = false;
+        }
       } else {             // check if input contains unit
         unit.push_back(i); // adding nonnumber to unit
         have_unit = true;
       }
     }
-    if (have_number) {
+    if (have_number && validity) {
       v = stod(temp); // extract value from temp
-    } else {
-      cout << "Input does not contain number.\n";
-      break;
+    } else if (have_number == false) {
+      cout << "Error: input does not contain any numbers.\n";
+      validity = false;
     } // preventing stod nonnumber
     if (have_unit == false) {
       cin >> unit;
     } // handling format of [number+' '+unit]
 
-    cout << unit << "\n";
     if (unit == "cm") {
       v *= 0.01;
     } else if (unit == "m") {
@@ -43,25 +53,24 @@ int main() {
     } else if (unit == "ft") {
       v *= 12 * 2.54 * 0.01;
     } else {
-      cout << "Invalid expression.\n";
-      break;
+      cout << "Error: Invalid unit.\n";
+      validity = false;
     } // unit conversion and validation
 
-    sum += v;
-    cnt += 1;
-    arr.push_back(v);
-    if (v < min) {
-      min = v;
-    }
-    if (v > max) {
-      max = v;
+    if (validity) {
+      sum += v;
+      cnt += 1;
+      arr.push_back(v);
     }
   }
-  cout << "Sum is: " << sum << "\n";
-  cout << "Smallest value is: " << min << "\n";
-  cout << "Largest value is: " << max << "\n";
-  cout << "Number of entries: " << cnt << "\n";
   sort(arr.begin(), arr.end());
+  cout << "Sum is: " << sum << "\n";
+  if (cnt > 0) {
+    cout << "Smallest value is: " << arr[0] << "\n";
+    cout << "Largest value is: " << arr[cnt - 1] << "\n";
+  }
+  cout << "Number of entries: " << cnt << "\n";
+
   for (auto x : arr) {
     cout << x << ' ';
   }
